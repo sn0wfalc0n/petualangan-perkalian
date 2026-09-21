@@ -5,21 +5,86 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Petualangan Perkalian</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#e0f2fe,#ede9fe);min-height:100vh;color:#172033}
-.wrap{max-width:760px;margin:auto;padding:20px}.hero,.board{background:#fff;border:1px solid #dbe3ef;border-radius:26px;box-shadow:0 10px 30px #00000012}
-.hero{padding:22px;margin-bottom:16px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.title{font-size:clamp(1.6rem,6vw,2.2rem);font-weight:900}.sub{color:#667085;margin-top:5px}.stats{display:flex;gap:7px;flex-wrap:wrap}.stat{background:#f8fafc;border:1px solid #e5e7eb;border-radius:14px;padding:8px 12px;text-align:center;min-width:75px}.stat b{display:block;font-size:1.1rem}.stat small{color:#667085}
-.progress-line{display:flex;justify-content:space-between;color:#667085;font-size:.8rem;margin:17px 0 6px}.progress{height:10px;background:#e5e7eb;border-radius:99px;overflow:hidden}.bar{height:100%;width:0;background:#6366f1;border-radius:99px;transition:.3s}
-.board{padding:30px;text-align:center}.screen-icon{font-size:4rem}.screen-title{font-size:2rem;font-weight:900;margin:5px}.screen-text{max-width:520px;margin:10px auto 22px;color:#667085;line-height:1.5}.primary{border:0;border-radius:16px;background:#6366f1;color:#fff;padding:15px 25px;font-size:1rem;font-weight:900;cursor:pointer}.primary:hover{filter:brightness(.94)}
-#game{display:none}.level{display:inline-block;background:#fef3c7;border:1px solid #f59e0b;border-radius:99px;padding:7px 14px;font-size:.8rem;font-weight:800}.question{font-size:clamp(3.5rem,14vw,6rem);font-weight:900;margin:20px 0 8px}.hint{color:#667085;margin-bottom:20px}.answers{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:530px;margin:auto}.answer{min-height:66px;border:2px solid #dbe3ef;background:#fff;border-radius:18px;font-size:1.4rem;font-weight:900;cursor:pointer}.answer:hover{transform:translateY(-2px);box-shadow:0 5px 15px #0001}.correct{background:#dcfce7!important;border-color:#22c55e!important;color:#166534}.wrong{background:#fee2e2!important;border-color:#ef4444!important;color:#991b1b}.feedback{height:32px;margin-top:13px;font-weight:800}.good{color:#15803d}.bad{color:#b91c1c}.bottom{display:flex;justify-content:center;gap:8px;margin-top:15px;color:#667085;font-size:.8rem}.pill{padding:7px 12px;border:1px solid #e5e7eb;border-radius:99px;background:#f8fafc}
-#result{display:none}.stars{font-size:2rem;margin:12px}.finalscore{font-size:3rem;font-weight:900}.resulttext{color:#667085;line-height:1.5;margin:10px auto 22px}
-@media(max-width:430px){.wrap{padding:10px}.hero,.board{border-radius:20px}.board{padding:22px 14px}.answer{min-height:58px;font-size:1.15rem}.stat{min-width:64px;padding:7px 8px}}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#e0f2fe,#ede9fe);min-height:100vh;color:#172033}
+.wrap{max-width:760px;margin:auto;padding:20px}
+.hero,.board{background:#fff;border:1px solid #dbe3ef;border-radius:26px;box-shadow:0 10px 30px #00000012}
+.hero{padding:22px;margin-bottom:16px}
+.top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.title{font-size:clamp(1.6rem,6vw,2.2rem);font-weight:900}
+.sub{color:#667085;margin-top:5px}
+.stats{display:flex;gap:7px;flex-wrap:wrap}
+.stat{background:#f8fafc;border:1px solid #e5e7eb;border-radius:14px;padding:8px 12px;text-align:center;min-width:75px}
+.stat b{display:block;font-size:1.1rem}
+.stat small{color:#667085}
+.progress-line{display:flex;justify-content:space-between;color:#667085;font-size:.8rem;margin:17px 0 6px}
+.progress{height:10px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.bar{height:100%;width:0;background:#6366f1;border-radius:99px;transition:width .4s ease}
+
+.board{padding:30px;text-align:center;position:relative;overflow:hidden}
+.screen-icon{font-size:4rem;animation:bounce 2s infinite ease-in-out}
+.screen-title{font-size:2rem;font-weight:900;margin:5px}
+.screen-text{max-width:520px;margin:10px auto 22px;color:#667085;line-height:1.5}
+
+.primary{border:0;border-radius:16px;background:#6366f1;color:#fff;padding:15px 25px;font-size:1rem;font-weight:900;cursor:pointer;transition:transform .2s, filter .2s}
+.primary:hover{filter:brightness(.94);transform:translateY(-2px)}
+.secondary{border:2px solid #6366f1;border-radius:16px;background:#fff;color:#6366f1;padding:13px 23px;font-size:1rem;font-weight:900;cursor:pointer;transition:transform .2s, background .2s}
+.secondary:hover{background:#f5f3ff;transform:translateY(-2px)}
+
+.btn-group{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:15px}
+
+#game,#summary,#result{display:none}
+.level{display:inline-block;background:#fef3c7;border:1px solid #f59e0b;border-radius:99px;padding:7px 14px;font-size:.8rem;font-weight:800}
+
+.question-box{transition:transform .3s ease, opacity .3s ease}
+.question{font-size:clamp(3.5rem,14vw,6rem);font-weight:900;margin:20px 0 8px}
+.hint{color:#667085;margin-bottom:20px}
+
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:530px;margin:auto}
+.answer{min-height:66px;border:2px solid #dbe3ef;background:#fff;border-radius:18px;font-size:1.4rem;font-weight:900;cursor:pointer;transition:transform .15s ease, background-color .2s ease, border-color .2s ease}
+.answer:hover{transform:translateY(-2px);box-shadow:0 5px 15px #0001}
+
+.correct{background:#dcfce7!important;border-color:#22c55e!important;color:#166534;animation:pop .3s ease-out}
+.wrong{background:#fee2e2!important;border-color:#ef4444!important;color:#991b1b;animation:shake .4s ease-in-out}
+
+.feedback{height:32px;margin-top:13px;font-weight:800;transition:all .3s}
+.good{color:#15803d}
+.bad{color:#b91c1c}
+
+.bottom{display:flex;justify-content:center;gap:8px;margin-top:15px;color:#667085;font-size:.8rem}
+.pill{padding:7px 12px;border:1px solid #e5e7eb;border-radius:99px;background:#f8fafc}
+
+.summary-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:20px;padding:20px;max-width:400px;margin:15px auto;display:flex;justify-content:space-around}
+.summary-item{text-align:center}
+.summary-item b{display:block;font-size:1.8rem;margin-bottom:2px}
+.summary-item span{font-size:.85rem;color:#667085;font-weight:bold}
+
+.stars{font-size:2.5rem;margin:12px}
+.finalscore{font-size:3rem;font-weight:900}
+.resulttext{color:#667085;line-height:1.5;margin:10px auto 22px}
+
+/* Animations */
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pop{0%{transform:scale(0.95)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.fade-in{animation:fadeIn .3s forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:430px){
+  .wrap{padding:10px}
+  .hero,.board{border-radius:20px}
+  .board{padding:22px 14px}
+  .answer{min-height:58px;font-size:1.15rem}
+  .stat{min-width:64px;padding:7px 8px}
+  .btn-group{flex-direction:column}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
 <section class="hero">
 <div class="top">
-<div><div class="title">🚀 Petualangan Perkalian</div><div class="sub">Kuasai perkalian 3 sampai 9!</div></div>
+<div><div class="title">🚀 Petualangan Perkalian</div><div class="sub">Kuasai perkalian 3×1 sampai 9×9!</div></div>
 <div class="stats">
 <div class="stat"><b id="score">0</b><small>⭐ SKOR</small></div>
 <div class="stat"><b id="combo">0</b><small>🔥 COMBO</small></div>
@@ -31,94 +96,257 @@
 </section>
 
 <section class="board">
-<div id="start">
+<!-- START SCREEN -->
+<div id="start" class="fade-in">
 <div class="screen-icon">🧠✨</div>
 <div class="screen-title">Siap Jadi Master?</div>
-<div class="screen-text">Selesaikan semua <b>49 soal</b>, dari 3×1 sampai 9×9. Pilih 1 dari 4 jawaban dan kumpulkan skor!</div>
+<div class="screen-text">Selesaikan perkalian secara berurutan dari <b>Perkalian 3 hingga 9</b>. Uji ketepatanmu di setiap tingkatan!</div>
 <button id="startBtn" class="primary">🎮 MULAI PETUALANGAN</button>
 </div>
 
+<!-- GAME SCREEN -->
 <div id="game">
-<div id="level" class="level">🏆 LEVEL 1</div>
+<div id="level" class="level">🏆 PERKALIAN 3</div>
+<div class="question-box fade-in" id="qBox">
 <div id="question" class="question">3 × 1</div>
 <div class="hint">Pilih jawaban yang benar 👇</div>
 <div id="answers" class="answers"></div>
+</div>
 <div id="feedback" class="feedback"></div>
-<div class="bottom"><span class="pill">📚 Soal <b id="current">1</b>/49</span><span class="pill">🔥 Streak <b id="streak">0</b></span></div>
+<div class="bottom"><span class="pill">📚 Soal <b id="current">1</b>/63</span><span class="pill">🔥 Streak <b id="streak">0</b></span></div>
 </div>
 
-<div id="result">
+<!-- SUMMARY SCREEN (PER ANGKA) -->
+<div id="summary" class="fade-in">
+<div class="screen-icon" id="sumIcon">📊</div>
+<div class="screen-title" id="sumTitle">Rangkuman Perkalian 3</div>
+<div class="screen-text" id="sumSub">Berikut adalah hasil performamu di perkalian ini:</div>
+<div class="summary-card">
+  <div class="summary-item"><b id="sumCorrect" style="color:#22c55e">0</b><span>BENAR</span></div>
+  <div class="summary-item"><b id="sumWrong" style="color:#ef4444">0</b><span>SALAH</span></div>
+  <div class="summary-item"><b id="sumAcc" style="color:#6366f1">0%</b><span>AKURASI</span></div>
+</div>
+<div class="btn-group">
+  <button id="retryGroupBtn" class="secondary">🔄 ULANGI PERKALIAN INI</button>
+  <button id="nextGroupBtn" class="primary">➡️ LANJUTKAN</button>
+</div>
+</div>
+
+<!-- RESULT SCREEN (FINAL) -->
+<div id="result" class="fade-in">
 <div class="screen-icon">🏆🎉</div>
 <div class="screen-title">Petualangan Selesai!</div>
 <div id="stars" class="stars">⭐⭐⭐</div>
 <div id="finalScore" class="finalscore">0</div>
 <div id="resultText" class="resulttext"></div>
-<button id="restart" class="primary">🔄 MAIN LAGI</button>
+<button id="restart" class="primary">🔄 MAIN LAGI DARI AWAL</button>
 </div>
 </section>
 </div>
 
 <script>
 const $=id=>document.getElementById(id);
-let questions=[],index=0,score=0,correct=0,combo=0,locked=false;
 
-function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function build(){questions=[];for(let a=3;a<=9;a++)for(let b=1;b<=9;b++)questions.push({a,b,ans:a*b});shuffle(questions)}
-function options(ans){
- let s=new Set([ans]);
- while(s.size<4){let v=ans+Math.floor(Math.random()*13)-6;if(v>0)s.add(v)}
- return shuffle([...s]);
+let questions=[], globalIndex=0, currentGroup=3, score=0, totalCorrect=0, combo=0, locked=false;
+let groupStats = { correct: 0, wrong: 0 };
+
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){
+    let j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
 }
-function stats(){
- $("score").textContent=score;$("combo").textContent=combo;$("correct").textContent=correct;
- $("progressText").textContent=index+" / 49 soal";
- $("accuracy").textContent="Akurasi "+(index?Math.round(correct/index*100):0)+"%";
- $("bar").style.width=(index/49*100)+"%";
+
+// Membangun daftar pertanyaan berurutan 3x1..3x9, 4x1..4x9 dst.
+function buildQuestions(){
+  questions=[];
+  for(let a=3; a<=9; a++){
+    for(let b=1; b<=9; b++){
+      questions.push({a, b, ans: a*b});
+    }
+  }
 }
-function show(){
- if(index>=49){finish();return}
- locked=false;
- let q=questions[index];
- $("question").textContent=q.a+" × "+q.b;
- $("current").textContent=index+1;
- $("level").textContent="🏆 LEVEL "+Math.min(7,Math.floor(index/7)+1);
- $("feedback").textContent="";$("feedback").className="feedback";
- $("answers").innerHTML="";
- options(q.ans).forEach(v=>{
-   let btn=document.createElement("button");btn.className="answer";btn.textContent=v;
-   btn.onclick=()=>answer(btn,v,q.ans);$("answers").appendChild(btn);
- });
- stats();
+
+// Menghasilkan 4 pilihan jawaban acak
+function generateOptions(ans){
+  let s=new Set([ans]);
+  while(s.size<4){
+    let offset = Math.floor(Math.random()*13) - 6;
+    let v = ans + offset;
+    if(v > 0 && v !== ans) s.add(v);
+  }
+  return shuffle([...s]);
 }
-function answer(btn,v,ans){
- if(locked)return;locked=true;
- if(v===ans){
-   btn.classList.add("correct");combo++;correct++;
-   score+=10+Math.min(combo,5)*2;
-   $("feedback").textContent=combo>=3?"🔥 COMBO! Hebat sekali!":"🎉 BENAR! Mantap!";
-   $("feedback").className="feedback good";
- }else{
-   btn.classList.add("wrong");combo=0;
-   [...$("answers").children].find(x=>+x.textContent===ans)?.classList.add("correct");
-   $("feedback").textContent="💡 Hampir! Jawabannya "+ans;
-   $("feedback").className="feedback bad";
- }
- index++;stats();$("streak").textContent=combo;
- setTimeout(show,650);
+
+function updateStats(){
+  $("score").textContent = score;
+  $("combo").textContent = combo;
+  $("correct").textContent = totalCorrect;
+  $("progressText").textContent = globalIndex + " / 63 soal";
+  $("accuracy").textContent = "Akurasi " + (globalIndex ? Math.round(totalCorrect / globalIndex * 100) : 0) + "%";
+  $("bar").style.width = (globalIndex / 63 * 100) + "%";
 }
-function start(){
- build();index=0;score=0;correct=0;combo=0;
- $("start").style.display="none";$("result").style.display="none";$("game").style.display="block";show();
+
+function showQuestion(){
+  if(globalIndex >= 63){
+    finishGame();
+    return;
+  }
+  
+  locked = false;
+  let q = questions[globalIndex];
+  
+  // Deteksi berganti kelompok angka perkalian (misal dari 3x9 ke 4x1)
+  if(q.a !== currentGroup && (globalIndex % 9 === 0)){
+    showSummary(q.a - 1);
+    return;
+  }
+  
+  currentGroup = q.a;
+  
+  // Reset / Trigger animasi soal baru
+  const qBox = $("qBox");
+  qBox.classList.remove("fade-in");
+  void qBox.offsetWidth; // trigger reflow
+  qBox.classList.add("fade-in");
+  
+  $("question").textContent = q.a + " × " + q.b;
+  $("current").textContent = globalIndex + 1;
+  $("level").textContent = "🏆 PERKALIAN " + q.a;
+  $("feedback").textContent = "";
+  $("feedback").className = "feedback";
+  $("answers").innerHTML = "";
+  
+  generateOptions(q.ans).forEach(v => {
+    let btn = document.createElement("button");
+    btn.className = "answer";
+    btn.textContent = v;
+    btn.onclick = () => checkAnswer(btn, v, q.ans);
+    $("answers").appendChild(btn);
+  });
+  
+  updateStats();
 }
-function finish(){
- $("game").style.display="none";$("result").style.display="block";
- let pct=Math.round(correct/49*100);
- $("stars").textContent=pct>=90?"⭐⭐⭐":pct>=70?"⭐⭐☆":pct>=50?"⭐☆☆":"☆☆☆";
- $("finalScore").textContent=score+" poin";
- $("resultText").innerHTML="Kamu menjawab <b>"+correct+" dari 49</b> soal dengan benar.<br>Akurasi <b>"+pct+"%</b>.<br><br>"+
- (pct>=90?"🏆 Luar biasa! Kamu Master Perkalian!":pct>=70?"🚀 Hebat! Sedikit lagi jadi Master!":pct>=50?"💪 Bagus! Terus berlatih!":"🌟 Jangan menyerah, coba lagi!");
+
+function checkAnswer(btn, selectedVal, correctVal){
+  if(locked) return;
+  locked = true;
+  
+  if(selectedVal === correctVal){
+    btn.classList.add("correct");
+    combo++;
+    totalCorrect++;
+    groupStats.correct++;
+    score += 10 + Math.min(combo, 5) * 2;
+    $("feedback").textContent = combo >= 3 ? "🔥 COMBO! Hebat sekali!" : "🎉 BENAR! Mantap!";
+    $("feedback").className = "feedback good";
+  } else {
+    btn.classList.add("wrong");
+    combo = 0;
+    groupStats.wrong++;
+    [...$("answers").children].find(x => +x.textContent === correctVal)?.classList.add("correct");
+    $("feedback").textContent = "💡 Hampir! Jawabannya " + correctVal;
+    $("feedback").className = "feedback bad";
+  }
+  
+  globalIndex++;
+  updateStats();
+  $("streak").textContent = combo;
+  
+  setTimeout(() => {
+    // Cek apakah setelah menjawab soal ini kelompok 9 soal baru saja selesai
+    if(globalIndex > 0 && globalIndex % 9 === 0){
+      showSummary(currentGroup);
+    } else {
+      showQuestion();
+    }
+  }, 750);
 }
-$("startBtn").onclick=start;$("restart").onclick=start;stats();
+
+function showSummary(completedGroup){
+  $("game").style.display = "none";
+  $("summary").style.display = "block";
+  
+  $("sumTitle").textContent = "Rangkuman Perkalian " + completedGroup;
+  $("sumCorrect").textContent = groupStats.correct;
+  $("sumWrong").textContent = groupStats.wrong;
+  
+  let groupAcc = Math.round((groupStats.correct / 9) * 100);
+  $("sumAcc").textContent = groupAcc + "%";
+  
+  if(groupStats.wrong === 0){
+    $("sumIcon").textContent = "🌟🎉";
+    $("sumSub").textContent = "Sempurna! Kamu menjawab semua perkalian " + completedGroup + " dengan BENAR!";
+  } else {
+    $("sumIcon").textContent = "📊";
+    $("sumSub").textContent = "Hasil kamu di Perkalian " + completedGroup + ". Mau lanjut atau ulang?";
+  }
+  
+  if(globalIndex >= 63){
+    $("nextGroupBtn").textContent = "🏆 LIHAT HASIL AKHIR";
+  } else {
+    $("nextGroupBtn").textContent = "➡️ PERKALIAN " + (completedGroup + 1);
+  }
+}
+
+function retryCurrentGroup(){
+  // Mengulang 9 soal perkalian saat ini
+  globalIndex -= 9;
+  totalCorrect -= groupStats.correct;
+  score = Math.max(0, score - (groupStats.correct * 10)); // Menyesuaikan skor saat mengulang
+  groupStats = { correct: 0, wrong: 0 };
+  
+  $("summary").style.display = "none";
+  $("game").style.display = "block";
+  showQuestion();
+}
+
+function nextGroup(){
+  groupStats = { correct: 0, wrong: 0 };
+  $("summary").style.display = "none";
+  
+  if(globalIndex >= 63){
+    finishGame();
+  } else {
+    $("game").style.display = "block";
+    showQuestion();
+  }
+}
+
+function startGame(){
+  buildQuestions();
+  globalIndex = 0;
+  score = 0;
+  totalCorrect = 0;
+  combo = 0;
+  currentGroup = 3;
+  groupStats = { correct: 0, wrong: 0 };
+  
+  $("start").style.display = "none";
+  $("result").style.display = "none";
+  $("summary").style.display = "none";
+  $("game").style.display = "block";
+  showQuestion();
+}
+
+function finishGame(){
+  $("game").style.display = "none";
+  $("summary").style.display = "none";
+  $("result").style.display = "block";
+  
+  let pct = Math.round(totalCorrect / 63 * 100);
+  $("stars").textContent = pct >= 90 ? "⭐⭐⭐" : pct >= 70 ? "⭐⭐☆" : pct >= 50 ? "⭐☆☆" : "☆☆☆";
+  $("finalScore").textContent = score + " poin";
+  $("resultText").innerHTML = "Kamu menjawab <b>" + totalCorrect + " dari 63</b> soal dengan benar.<br>Akurasi Total: <b>" + pct + "%</b>.<br><br>" +
+  (pct >= 90 ? "🏆 Luar biasa! Kamu Master Perkalian 3 sampai 9!" : pct >= 70 ? "🚀 Hebat! Sedikit lagi jadi Master!" : pct >= 50 ? "💪 Bagus! Terus berlatih!" : "🌟 Jangan menyerah, coba lagi!");
+}
+
+$("startBtn").onclick = startGame;
+$("restart").onclick = startGame;
+$("retryGroupBtn").onclick = retryCurrentGroup;
+$("nextGroupBtn").onclick = nextGroup;
+updateStats();
 </script>
 </body>
 </html>
