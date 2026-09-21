@@ -158,7 +158,6 @@ function shuffle(a){
   return a;
 }
 
-// Membangun daftar pertanyaan berurutan 3x1..3x9, 4x1..4x9 dst.
 function buildQuestions(){
   questions=[];
   for(let a=3; a<=9; a++){
@@ -168,7 +167,6 @@ function buildQuestions(){
   }
 }
 
-// Menghasilkan 4 pilihan jawaban acak
 function generateOptions(ans){
   let s=new Set([ans]);
   while(s.size<4){
@@ -196,19 +194,11 @@ function showQuestion(){
   
   locked = false;
   let q = questions[globalIndex];
-  
-  // Deteksi berganti kelompok angka perkalian (misal dari 3x9 ke 4x1)
-  if(q.a !== currentGroup && (globalIndex % 9 === 0)){
-    showSummary(q.a - 1);
-    return;
-  }
-  
   currentGroup = q.a;
   
-  // Reset / Trigger animasi soal baru
   const qBox = $("qBox");
   qBox.classList.remove("fade-in");
-  void qBox.offsetWidth; // trigger reflow
+  void qBox.offsetWidth; // trigger animation reset
   qBox.classList.add("fade-in");
   
   $("question").textContent = q.a + " × " + q.b;
@@ -255,7 +245,7 @@ function checkAnswer(btn, selectedVal, correctVal){
   $("streak").textContent = combo;
   
   setTimeout(() => {
-    // Cek apakah setelah menjawab soal ini kelompok 9 soal baru saja selesai
+    // Pengecekan jika kelompok 9 soal (perkalian X) baru saja selesai
     if(globalIndex > 0 && globalIndex % 9 === 0){
       showSummary(currentGroup);
     } else {
@@ -291,10 +281,12 @@ function showSummary(completedGroup){
 }
 
 function retryCurrentGroup(){
-  // Mengulang 9 soal perkalian saat ini
-  globalIndex -= 9;
+  // Hitung ulang indeks awal dari kelompok saat ini secara aman
+  let groupStartIndex = Math.floor((globalIndex - 1) / 9) * 9;
+  
+  // Mengurangi total correct yang dikumpulkan pada kelompok ini saja
   totalCorrect -= groupStats.correct;
-  score = Math.max(0, score - (groupStats.correct * 10)); // Menyesuaikan skor saat mengulang
+  globalIndex = groupStartIndex;
   groupStats = { correct: 0, wrong: 0 };
   
   $("summary").style.display = "none";
